@@ -1,3 +1,7 @@
+body {
+    background-color: rgb(245, 245, 255);
+}
+
 .navbar {
     background: rgb(255, 255, 255);
     font-family: calibri;
@@ -113,10 +117,11 @@ footer a {
     text-align: center;
 }
 
-.card-text{
-    margin-top: 10px;
-    font-size: 19px;
-    color: rgb(50, 55, 90);
+#predictedValue{
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: 700;
+    color: rgb(54, 60, 101);
 }
   
 .wrapper .form{
