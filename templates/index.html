@@ -149,7 +149,7 @@
                         </div>
                         <div class="input-group mb-3">
                             <input type="text" id="username" class="form-control form-control-lg bg-light fs-6"
-                                placeholder="Email address"  required>
+                                placeholder="Email address" required>
                         </div>
                         <div class="input-group mb-3">
                             <input type="password" id="password" class="form-control form-control-lg bg-light fs-6"
@@ -251,7 +251,7 @@
                 </div>
                 <div class="rightbox">
                     <div class="topbox"><span class="toptext">AVERAGE LAPTOP PRICE</span></div>
-                    <div class="botbox"><span class="bottext">Rs: 85000</span></div>
+                    <div class="botbox"><span class="bottext">Rs: 95020</span></div>
                 </div>
             </div>
             <div class="widge">
@@ -273,7 +273,7 @@
                 </div>
                 <div class="rightbox">
                     <div class="topbox"><span class="toptext">BEST RATING CATEGORY</span></div>
-                    <div class="botbox"><span class="bottext">Dell Inspiron</span></div>
+                    <div class="botbox"><span class="bottext">ASUS Vivobook</span></div>
                 </div>
             </div>
         </div>
@@ -466,7 +466,7 @@
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
             if (username === "aaa" && password === "123") {
-                showPage2('dashboard');
+            showPage2('dashboard');
             } else {
                 alert("Invalid username or password");
             }
@@ -528,10 +528,10 @@
         var myBarChart = new Chart(ctxB, {
             type: 'bar',
             data: {
-                "labels": ["Apple", "HP", "Acer", "Asus", "Dell", "Lenovo", "MSI", "Microsoft", "Toshiba", "Huawei", "Samsung", "LG"],
+                "labels": [],
                 datasets: [{
                     label: 'Average Price',
-                    "data": [150000, 90000, 45000, 52000, 55000, 52000, 130000, 70000, 85000, 75000, 80000, 85000, 100000],
+                    "data": [],
 
                     backgroundColor: "rgb(21, 214, 224)",
                     borderColor: "#0066cc",
@@ -549,15 +549,36 @@
             }
         });
 
+        function updateChartData(companyList, priceList) {
+            myBarChart.data.labels = companyList;
+            myBarChart.data.datasets[0].data = priceList;
+            myBarChart.update();
+        }
+
+        function fetchData() {
+            fetch('/get_laptop_company')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateChartData(data.company_list, data.price_list);
+                    } else {
+                        console.error(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        fetchData();
+
 
         var tbc = document.getElementById("typeChart").getContext('2d');
         var myTypeChart = new Chart(tbc, {
             type: 'bar',
             data: {
-                labels: ["Ultrabook", "Notebook", "Netbook", "Gaming", "Touchscreen", "Workstation"],
+                "labels": [],
                 datasets: [{
                     label: 'Laptop Categories',
-                    data: [80000, 40000, 35000, 90000, 70000, 120000, 0],
+                    "data": [],
 
                     backgroundColor: "#33cc33",
                     borderColor: "#145214",
@@ -576,23 +597,46 @@
         });
 
 
-        new Chart(document.getElementById("ramchart"), {
-            "type": "bar",
-            "data": {
-                "labels": [4, 6, 8, 12, 16, 24, 32],
-                "datasets": [{
-                    "label": "Ram Price",
-                    "data": [30000, 35000, 50000, 70000, 100000, 120000, 150000],
+        function updateTypeChartData(typeList, priceList) {
+            typeList[0] = typeList[0].replace(/\s/g, '');
+            myTypeChart.data.labels = typeList;
+            myTypeChart.data.datasets[0].data = priceList;
+            console.log(typeList);
+            myTypeChart.update();
+        }
 
-                    "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
-                    "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
-                    "borderWidth": 1
+        function fetchTypeData() {
+            fetch('/get_laptop_types')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateTypeChartData(data.type_list, data.price_list);
+                    } else {
+                        console.error(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        fetchTypeData();
+
+
+        var ramchart = new Chart(document.getElementById("ramchart"), {
+            type: "bar",
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Ram Price",
+                    data: [],
+                    backgroundColor: ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
+                    borderColor: ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
+                    borderWidth: 1
                 }, {
-                    "label": "Price varience",
-                    "data": [30000, 35000, 50000, 70000, 100000, 120000, 150000],
-                    "type": "line",
-                    "fill": false,
-                    "borderColor": "rgb(54, 162, 235)"
+                    label: "Price varience",
+                    data: [],
+                    type: "line",
+                    fill: false,
+                    borderColor: "rgb(54, 162, 235)"
                 }]
             },
             options: {
@@ -605,6 +649,32 @@
                 }
             }
         });
+
+        function updateRamChartData(ramData) {
+            var parsedData = JSON.parse(ramData);
+            var ramValues = parsedData.map(entry => entry.Ram);
+            var priceValues = parsedData.map(entry => entry.Price_euros);
+            ramchart.data.labels = ramValues;
+            ramchart.data.datasets[0].data = priceValues;
+            ramchart.data.datasets[1].data = priceValues; 
+            ramchart.update();
+        }
+
+        function fetchRAMData() {
+            fetch('/get_laptop_ram')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateRamChartData(data.data);
+                    } else {
+                        console.error(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        fetchRAMData();
+
 
 
 

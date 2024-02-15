@@ -6,25 +6,74 @@ import numpy as np
 app = Flask(__name__)
 CORS(app)
 
-filename = 'model/predictor.pickle'
+filename = 'model/laptop.pickle'
 with open(filename, 'rb') as file:
-        model = pickle.load(file)
+    loaded_data = pickle.load(file)
+
+model = loaded_data['best_model']
+data = loaded_data['data']
 
 def prediction(lst):
     pred_value = model.predict([lst])
     return pred_value
 
 def company_list():
-    company_values = model.groupby('Company')['Price_euros'].mean().reset_index()
-    return company_values
+    company_columns = [col for col in data.columns if col.startswith('Company_')]
+    
+    if company_columns:
+        company_values = data.groupby(company_columns)['Price_euros'].mean().reset_index()
+        return company_values
+    else:
+        print("No one-hot encoded 'Company' columns found in the dataset.")
+        raise ValueError("One-hot encoded 'Company' columns not found in the dataset.")
+    
 
-
-@app.route('/get_laptop_distribution', methods=['GET'])
-def get_laptop_distribution():
+@app.route('/get_laptop_company', methods=['GET'])
+def get_laptop_company():
     try:
         laptop_distribution = company_list()
+        if 'Price_euros' in laptop_distribution.columns:
+            company_list_values = [col.replace('Company_', '') for col in laptop_distribution.columns if col.startswith('Company_')]
+            price_list = laptop_distribution['Price_euros'].tolist()
+            return jsonify({'success': True, 'company_list': company_list_values, 'price_list': price_list})
+        else:
+            raise ValueError("'Price_euros' column not found in laptop_distribution.")
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+    
+
+def type_list():
+    type_columns = [col for col in data.columns if col.startswith('TypeName_')]
+    
+    if type_columns:
+        type_values = data.groupby(type_columns)['Price_euros'].mean().reset_index()
+        return type_values
+    else:
+        print("No one-hot encoded 'Company' columns found in the dataset.")
+        raise ValueError("One-hot encoded 'Company' columns not found in the dataset.")
+    
+
+@app.route('/get_laptop_types', methods=['GET'])
+def get_laptop_types():
+    try:
+        laptop_type = type_list()
+        if 'Price_euros' in laptop_type.columns:
+            type_list_values = [col.replace('TypeName_', '') for col in laptop_type.columns if col.startswith('TypeName_')]
+            price_list = laptop_type['Price_euros'].tolist()
+            print(type_list_values,price_list)
+            return jsonify({'success': True, 'type_list': type_list_values, 'price_list': price_list})
+        else:
+            raise ValueError("'Price_euros' column not found in laptop_type.")
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+    
+    
+    
+@app.route('/get_laptop_ram', methods=['GET'])
+def get_laptop_ram():
+    try:
+        laptop_distribution = data.groupby('Ram')['Price_euros'].mean().reset_index()
         result_json = laptop_distribution.to_json(orient='records')
-        print(result_json)
         return jsonify({'success': True, 'data': result_json})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
